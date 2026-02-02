@@ -29,6 +29,8 @@ public class Task {
     private String description;
     @NonNull
     private TaskStatus status;
+    @NonNull
+    private String dueDate;
 
     @NonNull
     @ManyToOne
