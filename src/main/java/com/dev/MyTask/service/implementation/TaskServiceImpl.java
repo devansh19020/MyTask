@@ -1,16 +1,17 @@
 package com.dev.MyTask.service.implementation;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dev.MyTask.entity.Task;
 import com.dev.MyTask.entity.User;
 import com.dev.MyTask.enums.TaskStatus;
-import com.dev.MyTask.repository.UserRepository;
-import com.dev.MyTask.service.TaskService;
 import com.dev.MyTask.exception.ResourceNotFoundException;
 import com.dev.MyTask.repository.TaskRepository;
+import com.dev.MyTask.repository.UserRepository;
+import com.dev.MyTask.service.TaskService;
 
 @Service
 @Transactional
