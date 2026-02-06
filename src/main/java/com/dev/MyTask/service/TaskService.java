@@ -3,13 +3,15 @@ package com.dev.MyTask.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.dev.MyTask.dto.task.TaskCreateRequest;
+import com.dev.MyTask.dto.task.TaskUpdateRequest;
 import com.dev.MyTask.entity.Task;
 import com.dev.MyTask.enums.TaskStatus;
 
 public interface TaskService {
 
-    Task createTask(Long userId, Task task);
-    Task updateTask(Long taskId, Task updatedTask);
+    Task createTask(Long userId, TaskCreateRequest request);
+    Task updateTask(Long taskId, TaskUpdateRequest request);
     void deleteTask(Long taskId);
     Task changeTaskStatus(Long taskId, TaskStatus status);
 

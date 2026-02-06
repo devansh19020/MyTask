@@ -11,8 +11,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dev.MyTask.dto.user.AdminUserResponse;
+import com.dev.MyTask.dto.user.UserCreateRequest;
+import com.dev.MyTask.dto.user.UserResponse;
 import com.dev.MyTask.entity.User;
 import com.dev.MyTask.service.UserService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -28,9 +33,17 @@ public class AdminController {
     // ================= USERS =================
 
     @PostMapping("/users")
-    public User createAdmin(@RequestBody User user) {
-        return userService.createAdmin(user);
+    public UserResponse createAdmin(
+            @Valid @RequestBody UserCreateRequest request) {
+
+        User admin = userService.createAdmin(request);
+        return new UserResponse(
+                admin.getId(),
+                admin.getEmail(),
+                admin.getRole().name()
+        );
     }
+
 
     @GetMapping("/users")
     public List<User> getAllUsers() {
@@ -38,8 +51,15 @@ public class AdminController {
     }
 
     @GetMapping("/users/{id}")
-    public User getUserById(@PathVariable Long id) {
-        return userService.getUserById(id);
+    public AdminUserResponse getUserById(@PathVariable Long id) {
+
+        User user = userService.getUserById(id);
+
+        return new AdminUserResponse(
+                user.getId(),
+                user.getEmail(),
+                user.getRole().name()
+        );
     }
 
     @DeleteMapping("/users/{id}")

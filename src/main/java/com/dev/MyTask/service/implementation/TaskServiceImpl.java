@@ -5,6 +5,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.dev.MyTask.dto.task.TaskCreateRequest;
+import com.dev.MyTask.dto.task.TaskUpdateRequest;
 import com.dev.MyTask.entity.Task;
 import com.dev.MyTask.entity.User;
 import com.dev.MyTask.enums.TaskStatus;
@@ -29,18 +31,18 @@ public class TaskServiceImpl implements TaskService {
     // ================= CREATE =================
 
     @Override
-    public Task createTask(Long userId, Task task) {
+    public Task createTask(Long userId, TaskCreateRequest request) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "User not found with id: " + userId
-                        )
-                );
+                        new RuntimeException("User not found"));
 
-        task.setId(null); // safety: force new entity
+        Task task = new Task();
+        task.setTitle(request.getTitle());
+        task.setDescription(request.getDescription());
+        task.setStatus(request.getStatus());
+        task.setDueDate(request.getDueDate());
         task.setUser(user);
-        task.setStatus(TaskStatus.TODO);
 
         return taskRepository.save(task);
     }
@@ -48,15 +50,31 @@ public class TaskServiceImpl implements TaskService {
     // ================= UPDATE =================
 
     @Override
-    public Task updateTask(Long taskId, Task updatedTask) {
+    public Task updateTask(Long taskId, TaskUpdateRequest request) {
 
-        Task existingTask = getTaskById(taskId);
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Task not found with id: " + taskId
+                        ));
 
-        existingTask.setTitle(updatedTask.getTitle());
-        existingTask.setDescription(updatedTask.getDescription());
-        existingTask.setDueDate(updatedTask.getDueDate());
+        if (request.getTitle() != null) {
+            task.setTitle(request.getTitle());
+        }
 
-        return taskRepository.save(existingTask);
+        if (request.getDescription() != null) {
+            task.setDescription(request.getDescription());
+        }
+
+        if (request.getStatus() != null) {
+            task.setStatus(request.getStatus());
+        }
+
+        if (request.getDueDate() != null) {
+            task.setDueDate(request.getDueDate());
+        }
+
+        return taskRepository.save(task);
     }
 
     // ================= DELETE =================

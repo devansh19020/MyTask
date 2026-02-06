@@ -14,8 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.dev.MyTask.entity.Task;
-import com.dev.MyTask.entity.User;
+import com.dev.MyTask.dto.task.TaskCreateRequest;
+import com.dev.MyTask.dto.task.TaskResponse;
+import com.dev.MyTask.dto.task.TaskUpdateRequest;
+import com.dev.MyTask.dto.user.UserResponse;
+import com.dev.MyTask.dto.user.UserUpdateRequest;
 import com.dev.MyTask.enums.TaskStatus;
 import com.dev.MyTask.service.TaskService;
 import com.dev.MyTask.service.UserService;
@@ -37,10 +40,17 @@ public class UserController {
     // ================= USER PROFILE =================
 
     @PutMapping("/profile/{userId}")
-    public User updateProfile(
+    public UserResponse updateProfile(
             @PathVariable Long userId,
-            @RequestBody User updatedUser) {
-        return userService.updateUser(userId, updatedUser);
+            @RequestBody UserUpdateRequest request) {
+
+        var user = userService.updateUser(userId, request);
+
+        return new UserResponse(
+                user.getId(),
+                user.getEmail(),
+                user.getRole().name()
+        );
     }
 
     @DeleteMapping("/profile/{userId}")
@@ -51,17 +61,35 @@ public class UserController {
     // ================= TASKS =================
 
     @PostMapping("/tasks/{userId}")
-    public Task createTask(
+    public TaskResponse createTask(
             @PathVariable Long userId,
-            @RequestBody Task task) {
-        return taskService.createTask(userId, task);
+            @RequestBody TaskCreateRequest request) {
+
+        var task = taskService.createTask(userId, request);
+
+        return new TaskResponse(
+                task.getId(),
+                task.getTitle(),
+                task.getDescription(),
+                task.getStatus(),
+                task.getDueDate()
+        );
     }
 
     @PutMapping("/tasks/{taskId}")
-    public Task updateTask(
+    public TaskResponse updateTask(
             @PathVariable Long taskId,
-            @RequestBody Task task) {
-        return taskService.updateTask(taskId, task);
+            @RequestBody TaskUpdateRequest request) {
+
+        var task = taskService.updateTask(taskId, request);
+
+        return new TaskResponse(
+                task.getId(),
+                task.getTitle(),
+                task.getDescription(),
+                task.getStatus(),
+                task.getDueDate()
+        );
     }
 
     @DeleteMapping("/tasks/{taskId}")
@@ -70,23 +98,48 @@ public class UserController {
     }
 
     @PatchMapping("/tasks/{taskId}/status")
-    public Task changeStatus(
+    public TaskResponse changeStatus(
             @PathVariable Long taskId,
             @RequestParam TaskStatus status) {
-        return taskService.changeTaskStatus(taskId, status);
+
+        var task = taskService.changeTaskStatus(taskId, status);
+
+        return new TaskResponse(
+                task.getId(),
+                task.getTitle(),
+                task.getDescription(),
+                task.getStatus(),
+                task.getDueDate()
+        );
     }
 
     @GetMapping("/tasks/{userId}")
-    public Page<Task> getAllTasks(
+    public Page<TaskResponse> getAllTasks(
             @PathVariable Long userId,
             Pageable pageable) {
-        return taskService.getAllTasks(userId, pageable);
+
+        return taskService.getAllTasks(userId, pageable)
+                .map(task -> new TaskResponse(
+                        task.getId(),
+                        task.getTitle(),
+                        task.getDescription(),
+                        task.getStatus(),
+                        task.getDueDate()
+                ));
     }
 
     @GetMapping("/tasks/{userId}/pending")
-    public Page<Task> getPendingTasks(
+    public Page<TaskResponse> getPendingTasks(
             @PathVariable Long userId,
             Pageable pageable) {
-        return taskService.getPendingTasks(userId, pageable);
+
+        return taskService.getPendingTasks(userId, pageable)
+                .map(task -> new TaskResponse(
+                        task.getId(),
+                        task.getTitle(),
+                        task.getDescription(),
+                        task.getStatus(),
+                        task.getDueDate()
+                ));
     }
 }
