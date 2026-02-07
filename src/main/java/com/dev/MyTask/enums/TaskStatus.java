@@ -1,7 +1,7 @@
 package com.dev.MyTask.enums;
 
 public enum TaskStatus {
-    TODO,
+    PENDING,
     IN_PROGRESS,
-    DONE
+    COMPLETED
 }

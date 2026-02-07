@@ -90,12 +90,17 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Task changeTaskStatus(Long taskId, TaskStatus status) {
-
         Task task = getTaskById(taskId);
+        if (task.getStatus() == TaskStatus.COMPLETED &&
+            status == TaskStatus.PENDING) {
+            throw new IllegalArgumentException(
+                "Completed task cannot be moved back to pending"
+            );
+        }
         task.setStatus(status);
-
         return taskRepository.save(task);
     }
+
 
     // ================= READ =================
 
@@ -114,7 +119,7 @@ public class TaskServiceImpl implements TaskService {
         validateUserExists(userId);
         return taskRepository.findByUserIdAndStatus(
                 userId,
-                TaskStatus.TODO,
+                TaskStatus.PENDING,
                 pageable
         );
     }

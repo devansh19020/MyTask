@@ -9,6 +9,7 @@ import com.dev.MyTask.dto.user.UserCreateRequest;
 import com.dev.MyTask.dto.user.UserUpdateRequest;
 import com.dev.MyTask.entity.User;
 import com.dev.MyTask.enums.Role;
+import com.dev.MyTask.exception.ConflictException;
 import com.dev.MyTask.exception.ResourceNotFoundException;
 import com.dev.MyTask.repository.UserRepository;
 import com.dev.MyTask.service.UserService;
@@ -32,6 +33,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public User createUser(UserCreateRequest request) {
 
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new ConflictException(
+                "Email already exists: " + request.getEmail()
+            );
+        }
+
         User user = new User();
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -40,11 +47,16 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
+
     // ================= CREATE ADMIN =================
 
     @Override
     public User createAdmin(UserCreateRequest request) {
-
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new ConflictException(
+                "Admin email already exists: " + request.getEmail()
+            );
+        }
         User admin = new User();
         admin.setEmail(request.getEmail());
         admin.setPassword(passwordEncoder.encode(request.getPassword()));
