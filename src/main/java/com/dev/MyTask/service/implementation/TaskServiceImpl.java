@@ -40,7 +40,7 @@ public class TaskServiceImpl implements TaskService {
         Task task = new Task();
         task.setTitle(request.getTitle());
         task.setDescription(request.getDescription());
-        task.setStatus(request.getStatus());
+        task.setStatus(TaskStatus.PENDING);
         task.setDueDate(request.getDueDate());
         task.setUser(user);
 

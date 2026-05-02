@@ -3,6 +3,8 @@ package com.dev.MyTask.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 import com.dev.MyTask.entity.Task;
 import com.dev.MyTask.enums.TaskStatus;
@@ -16,6 +18,10 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             TaskStatus status,
             Pageable pageable
     );
+    
+    @Modifying
+    @Query("DELETE FROM Task t WHERE t.user.id = :userId")
+    void deleteByUserId(Long userId);
 }
 
 

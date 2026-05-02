@@ -13,6 +13,7 @@ import com.dev.MyTask.exception.ConflictException;
 import com.dev.MyTask.exception.ResourceNotFoundException;
 import com.dev.MyTask.repository.UserRepository;
 import com.dev.MyTask.service.UserService;
+import com.dev.MyTask.repository.TaskRepository;
 
 
 @Transactional
@@ -21,11 +22,15 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TaskRepository taskRepository;
 
     public UserServiceImpl(UserRepository userRepository,
-                           PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder,
+                           TaskRepository taskRepository
+                        ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.taskRepository = taskRepository;
     }
 
     // ================= CREATE USER =================
@@ -72,7 +77,12 @@ public class UserServiceImpl implements UserService {
 
         User existingUser = getUserById(userId);
 
-        if (request.getEmail() != null) {
+        if (request.getEmail() != null && request.getEmail() != existingUser.getEmail()) {
+            if (userRepository.existsByEmail(request.getEmail())) {
+                throw new ConflictException(
+                    "Email already exists: " + request.getEmail()
+                );
+            }
             existingUser.setEmail(request.getEmail());
         }
 
@@ -89,10 +99,20 @@ public class UserServiceImpl implements UserService {
 
     // ================= DELETE =================
 
+    @Transactional
     @Override
     public void deleteUser(Long userId) {
-        userRepository.deleteById(userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "User not found with id: " + userId
+                        ));
+
+        taskRepository.deleteByUserId(userId);
+        userRepository.delete(user);
     }
+
 
     // ================= FETCH =================
 
