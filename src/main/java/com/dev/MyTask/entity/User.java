@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.dev.MyTask.enums.Role;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,14 +24,19 @@ import lombok.NonNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Schema(description = "User entity representation")
 public class User implements UserDetails{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "Unique user identifier", example = "1")
     private Long id;
     @NonNull
+    @Schema(description = "User email address", example = "user@example.com")
     private String email;
+    @Schema(description = "Hashed user password", accessMode = Schema.AccessMode.WRITE_ONLY)
     private String password;
     @NonNull
+    @Schema(description = "User role", example = "USER")
     private Role role;
 
     @Override
